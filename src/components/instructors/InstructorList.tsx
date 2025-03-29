@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { Instructor } from '@/pages/Instructors';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,40 +24,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-// Temporary mock data until we integrate with a backend
-const initialInstructors = [
-  { 
-    id: 1, 
-    name: 'Ana García', 
-    email: 'ana.garcia@ejemplo.com',
-    courses: 3,
-    rating: 4.8,
-    status: 'Active',
-    avatar: '',
-  },
-  { 
-    id: 2, 
-    name: 'Carlos Rodríguez', 
-    email: 'carlos.rodriguez@ejemplo.com',
-    courses: 2,
-    rating: 4.5,
-    status: 'Active',
-    avatar: '',
-  },
-  { 
-    id: 3, 
-    name: 'Laura Martínez', 
-    email: 'laura.martinez@ejemplo.com',
-    courses: 4,
-    rating: 4.9,
-    status: 'Active',
-    avatar: '',
-  },
-];
+interface InstructorListProps {
+  instructors: Instructor[];
+  onDelete: (id: number) => void;
+  onEdit: (id: number) => void;
+}
 
-export const InstructorList = () => {
+export const InstructorList = ({ instructors, onDelete, onEdit }: InstructorListProps) => {
   const navigate = useNavigate();
-  const [instructors, setInstructors] = useState(initialInstructors);
   const [instructorToDelete, setInstructorToDelete] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -68,11 +42,15 @@ export const InstructorList = () => {
 
   const confirmDelete = () => {
     if (instructorToDelete) {
-      setInstructors(instructors.filter(instructor => instructor.id !== instructorToDelete));
-      toast.success('Instructor eliminado con éxito');
+      onDelete(instructorToDelete);
       setIsDeleteDialogOpen(false);
       setInstructorToDelete(null);
     }
+  };
+
+  const handleView = (id: number) => {
+    // For now, just navigate to the edit page as we don't have a view page
+    navigate(`/instructors/${id}/edit`);
   };
 
   return (
@@ -120,11 +98,11 @@ export const InstructorList = () => {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => navigate(`/instructors/${instructor.id}`)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleView(instructor.id)}>
                       <Eye size={16} />
                       <span className="sr-only">Ver</span>
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => navigate(`/instructors/${instructor.id}/edit`)}>
+                    <Button variant="ghost" size="sm" onClick={() => onEdit(instructor.id)}>
                       <Pencil size={16} />
                       <span className="sr-only">Editar</span>
                     </Button>

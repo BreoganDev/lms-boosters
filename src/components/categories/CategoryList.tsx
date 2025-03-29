@@ -9,9 +9,9 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2, PlusCircle } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { Category } from '@/pages/Categories';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,116 +29,58 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// Temporary mock data until we integrate with a backend
-const initialCategories = [
-  { 
-    id: 1, 
-    name: 'Desarrollo Web', 
-    slug: 'desarrollo-web',
-    coursesCount: 12,
-  },
-  { 
-    id: 2, 
-    name: 'Programación', 
-    slug: 'programacion',
-    coursesCount: 8,
-  },
-  { 
-    id: 3, 
-    name: 'Diseño', 
-    slug: 'diseno',
-    coursesCount: 5,
-  },
-  { 
-    id: 4, 
-    name: 'Marketing Digital', 
-    slug: 'marketing-digital',
-    coursesCount: 7,
-  },
-  { 
-    id: 5, 
-    name: 'Idiomas', 
-    slug: 'idiomas',
-    coursesCount: 4,
-  },
-];
+interface CategoryListProps {
+  categories: Category[];
+  onDelete: (id: number) => void;
+  onEdit: (category: Category) => void;
+}
 
-export const CategoryList = () => {
+export const CategoryList = ({ categories, onDelete, onEdit }: CategoryListProps) => {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState(initialCategories);
   const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editedName, setEditedName] = useState('');
 
-  const handleDelete = (id: number) => {
+  const handleDeleteClick = (id: number) => {
     setCategoryToDelete(id);
     setIsDeleteDialogOpen(true);
   };
 
   const confirmDelete = () => {
     if (categoryToDelete) {
-      setCategories(categories.filter(category => category.id !== categoryToDelete));
-      toast.success('Categoría eliminada con éxito');
+      onDelete(categoryToDelete);
       setIsDeleteDialogOpen(false);
       setCategoryToDelete(null);
     }
   };
 
-  const handleAddCategory = () => {
-    if (newCategoryName.trim()) {
-      const newCategory = {
-        id: Math.max(...categories.map(c => c.id)) + 1,
-        name: newCategoryName,
-        slug: newCategoryName.toLowerCase().replace(/\s+/g, '-'),
-        coursesCount: 0
+  const handleEditClick = (category: Category) => {
+    setEditingCategory(category);
+    setEditedName(category.name);
+    setIsEditDialogOpen(true);
+  };
+
+  const confirmEdit = () => {
+    if (editingCategory && editedName.trim()) {
+      const updatedCategory = {
+        ...editingCategory,
+        name: editedName,
+        slug: editedName.toLowerCase().replace(/\s+/g, '-')
       };
-      setCategories([...categories, newCategory]);
-      setNewCategoryName('');
-      setIsAddDialogOpen(false);
-      toast.success('Categoría añadida con éxito');
+      onEdit(updatedCategory);
+      setIsEditDialogOpen(false);
+      setEditingCategory(null);
     }
   };
 
   return (
     <>
-      <div className="flex justify-end mb-4">
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <PlusCircle size={16} /> Añadir Categoría
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Añadir Nueva Categoría</DialogTitle>
-              <DialogDescription>
-                Ingrese el nombre de la nueva categoría.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <Label htmlFor="categoryName">Nombre de la Categoría</Label>
-              <Input
-                id="categoryName"
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                placeholder="Ej: Desarrollo Móvil"
-                className="mt-2"
-              />
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleAddCategory}>Guardar</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -159,11 +101,11 @@ export const CategoryList = () => {
                 <TableCell>{category.coursesCount}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => navigate(`/categories/${category.id}/edit`)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleEditClick(category)}>
                       <Pencil size={16} />
                       <span className="sr-only">Editar</span>
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(category.id)}>
+                    <Button variant="ghost" size="sm" onClick={() => handleDeleteClick(category.id)}>
                       <Trash2 size={16} className="text-destructive" />
                       <span className="sr-only">Eliminar</span>
                     </Button>
@@ -175,6 +117,7 @@ export const CategoryList = () => {
         </Table>
       </div>
 
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -191,6 +134,31 @@ export const CategoryList = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Category Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Categoría</DialogTitle>
+            <DialogDescription>
+              Actualice el nombre de la categoría.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="editCategoryName">Nombre de la Categoría</Label>
+            <Input
+              id="editCategoryName"
+              value={editedName}
+              onChange={(e) => setEditedName(e.target.value)}
+              className="mt-2"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancelar</Button>
+            <Button onClick={confirmEdit}>Guardar Cambios</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
