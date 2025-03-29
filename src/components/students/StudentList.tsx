@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Table, 
   TableBody, 
@@ -10,126 +10,151 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useNavigate } from 'react-router-dom';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from 'sonner';
 
-// Temporary mock data until we integrate with a backend
-const mockStudents = [
+// Type for student data
+export interface Student {
+  id: number;
+  name: string;
+  email: string;
+  courses: number;
+  status: string;
+}
+
+// Initial students data
+export const initialStudents: Student[] = [
   { 
     id: 1, 
-    name: 'Ana García', 
-    email: 'ana.garcia@ejemplo.com',
-    enrolledCourses: 3,
-    progress: 75,
-    status: 'Active',
-    avatar: '',
+    name: 'Juan Pérez', 
+    email: 'juan.perez@ejemplo.com',
+    courses: 3,
+    status: 'Active'
   },
   { 
     id: 2, 
-    name: 'Carlos Rodríguez', 
-    email: 'carlos.rodriguez@ejemplo.com',
-    enrolledCourses: 2,
-    progress: 50,
-    status: 'Active',
-    avatar: '',
+    name: 'María López', 
+    email: 'maria.lopez@ejemplo.com',
+    courses: 2,
+    status: 'Active'
   },
   { 
     id: 3, 
-    name: 'Laura Martínez', 
-    email: 'laura.martinez@ejemplo.com',
-    enrolledCourses: 4,
-    progress: 90,
-    status: 'Active',
-    avatar: '',
+    name: 'Pedro Sánchez', 
+    email: 'pedro.sanchez@ejemplo.com',
+    courses: 1,
+    status: 'Inactive'
   },
   { 
     id: 4, 
-    name: 'Miguel Sánchez', 
-    email: 'miguel.sanchez@ejemplo.com',
-    enrolledCourses: 1,
-    progress: 30,
-    status: 'Inactive',
-    avatar: '',
+    name: 'Ana Martínez', 
+    email: 'ana.martinez@ejemplo.com',
+    courses: 4,
+    status: 'Active'
   },
   { 
     id: 5, 
-    name: 'Elena Torres', 
-    email: 'elena.torres@ejemplo.com',
-    enrolledCourses: 2,
-    progress: 60,
-    status: 'Active',
-    avatar: '',
+    name: 'Carlos Rodríguez', 
+    email: 'carlos.rodriguez@ejemplo.com',
+    courses: 0,
+    status: 'Inactive'
   },
 ];
 
-export const StudentList = () => {
+interface StudentListProps {
+  students?: Student[];
+  onDelete?: (id: number) => void;
+}
+
+export const StudentList = ({ students = initialStudents, onDelete }: StudentListProps) => {
   const navigate = useNavigate();
+  const [studentToDelete, setStudentToDelete] = useState<number | null>(null);
+
+  const handleDelete = (id: number) => {
+    if (onDelete) {
+      onDelete(id);
+    } else {
+      toast.success('Estudiante eliminado con éxito');
+    }
+    setStudentToDelete(null);
+  };
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Cursos</TableHead>
-            <TableHead>Progreso</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead className="text-right">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {mockStudents.map((student) => (
-            <TableRow key={student.id}>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Avatar>
-                    <AvatarImage src={student.avatar} />
-                    <AvatarFallback>{student.name.substring(0, 2)}</AvatarFallback>
-                  </Avatar>
-                  <span className="font-medium">{student.name}</span>
-                </div>
-              </TableCell>
-              <TableCell>{student.email}</TableCell>
-              <TableCell>{student.enrolledCourses}</TableCell>
-              <TableCell>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-primary h-2.5 rounded-full" 
-                    style={{ width: `${student.progress}%` }}
-                  ></div>
-                </div>
-                <span className="text-xs text-gray-500 mt-1">{student.progress}%</span>
-              </TableCell>
-              <TableCell>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  student.status === 'Active' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {student.status}
-                </span>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="sm" onClick={() => navigate(`/students/${student.id}`)}>
-                    <Eye size={16} />
-                    <span className="sr-only">Ver</span>
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => navigate(`/students/${student.id}/edit`)}>
-                    <Pencil size={16} />
-                    <span className="sr-only">Editar</span>
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Trash2 size={16} className="text-destructive" />
-                    <span className="sr-only">Eliminar</span>
-                  </Button>
-                </div>
-              </TableCell>
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Cursos</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead className="text-right">Acciones</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {students.map((student) => (
+              <TableRow key={student.id}>
+                <TableCell className="font-medium">{student.name}</TableCell>
+                <TableCell>{student.email}</TableCell>
+                <TableCell>{student.courses}</TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    student.status === 'Active' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {student.status}
+                  </span>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => navigate(`/students/${student.id}`)}>
+                      <Eye size={16} />
+                      <span className="sr-only">Ver</span>
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => navigate(`/students/${student.id}/edit`)}>
+                      <Pencil size={16} />
+                      <span className="sr-only">Editar</span>
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setStudentToDelete(student.id)}>
+                      <Trash2 size={16} className="text-destructive" />
+                      <span className="sr-only">Eliminar</span>
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <AlertDialog open={studentToDelete !== null} onOpenChange={(open) => !open && setStudentToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Está seguro de eliminar este estudiante?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. El estudiante será eliminado permanentemente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={() => studentToDelete && handleDelete(studentToDelete)} className="bg-destructive text-destructive-foreground">
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
