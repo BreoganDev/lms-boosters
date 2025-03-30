@@ -11,11 +11,17 @@
   will-change: filter;
   transition: filter 300ms;
 }
+<<<<<<< HEAD
 
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
 
+=======
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -24,7 +30,10 @@
   from {
     transform: rotate(0deg);
   }
+<<<<<<< HEAD
 
+=======
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
   to {
     transform: rotate(360deg);
   }

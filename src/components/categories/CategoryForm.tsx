@@ -1,9 +1,16 @@
+<<<<<<< HEAD
 // src/components/categories/CategoryForm.tsx
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+=======
+
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from '@/components/ui/form';
@@ -11,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+<<<<<<< HEAD
 import { Spinner } from '@/components/ui/spinner';
 import { categoryService } from '@/services/categoryService';
 
@@ -23,17 +31,31 @@ const categorySchema = z.object({
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
+=======
+
+type CategoryFormData = {
+  name: string;
+  description: string;
+  slug: string;
+  icon: string;
+};
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
 
 const CategoryForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = Boolean(id);
+<<<<<<< HEAD
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState<boolean>(isEditing);
 
   // Inicializar formulario
   const form = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
+=======
+
+  const form = useForm<CategoryFormData>({
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
     defaultValues: {
       name: '',
       description: '',
@@ -42,6 +64,7 @@ const CategoryForm = () => {
     },
   });
 
+<<<<<<< HEAD
   // Cargar datos de la categoría si estamos editando
   useEffect(() => {
     const fetchCategory = async () => {
@@ -71,6 +94,8 @@ const CategoryForm = () => {
   }, [isEditing, id, form, navigate]);
 
   // Función para generar slug a partir del nombre
+=======
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
@@ -81,6 +106,7 @@ const CategoryForm = () => {
       .replace(/-+$/, '');
   };
 
+<<<<<<< HEAD
   // Manejar cambio en el campo de nombre
   const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
@@ -130,6 +156,26 @@ const CategoryForm = () => {
     );
   }
 
+=======
+  const onNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    form.setValue('name', name);
+    form.setValue('slug', generateSlug(name));
+  };
+
+  const onSubmit = (data: CategoryFormData) => {
+    console.log('Categoría guardada:', data);
+    
+    // Aquí se integraría con una API real
+    setTimeout(() => {
+      toast.success(
+        isEditing ? 'Categoría actualizada con éxito' : 'Categoría creada con éxito'
+      );
+      navigate('/categories');
+    }, 500);
+  };
+
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
   return (
     <MainLayout>
       <div className="space-y-6 max-w-3xl mx-auto">
@@ -155,7 +201,10 @@ const CategoryForm = () => {
                           {...field} 
                           placeholder="Ingrese el nombre de la categoría" 
                           onChange={onNameChange}
+<<<<<<< HEAD
                           disabled={isLoading}
+=======
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
                         />
                       </FormControl>
                       <FormMessage />
@@ -174,7 +223,10 @@ const CategoryForm = () => {
                           {...field} 
                           placeholder="Describa brevemente la categoría"
                           className="min-h-32"
+<<<<<<< HEAD
                           disabled={isLoading}
+=======
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
                         />
                       </FormControl>
                       <FormMessage />
@@ -189,11 +241,15 @@ const CategoryForm = () => {
                     <FormItem>
                       <FormLabel>Slug</FormLabel>
                       <FormControl>
+<<<<<<< HEAD
                         <Input 
                           {...field} 
                           placeholder="nombre-de-la-categoria" 
                           disabled={isLoading}
                         />
+=======
+                        <Input {...field} placeholder="nombre-de-la-categoria" />
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
                       </FormControl>
                       <FormDescription>
                         El slug se utiliza en las URLs. Se genera automáticamente a partir del nombre, pero puede editarlo.
@@ -210,11 +266,15 @@ const CategoryForm = () => {
                     <FormItem>
                       <FormLabel>Icono (nombre de clase)</FormLabel>
                       <FormControl>
+<<<<<<< HEAD
                         <Input 
                           {...field} 
                           placeholder="Ej: fa-book, icon-web, etc." 
                           disabled={isLoading}
                         />
+=======
+                        <Input {...field} placeholder="Ej: fa-book, icon-web, etc." />
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
                       </FormControl>
                       <FormDescription>
                         Nombre de la clase CSS del icono que se mostrará junto a la categoría.
@@ -227,6 +287,7 @@ const CategoryForm = () => {
             </Card>
 
             <div className="flex gap-4 justify-end">
+<<<<<<< HEAD
               <Button 
                 type="button" 
                 variant="outline" 
@@ -239,6 +300,12 @@ const CategoryForm = () => {
                 {isLoading && <Spinner className="mr-2 h-4 w-4" />}
                 Guardar Categoría
               </Button>
+=======
+              <Button type="button" variant="outline" onClick={() => navigate('/categories')}>
+                Cancelar
+              </Button>
+              <Button type="submit">Guardar Categoría</Button>
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
             </div>
           </form>
         </Form>
@@ -247,4 +314,8 @@ const CategoryForm = () => {
   );
 };
 
+<<<<<<< HEAD
 export default CategoryForm;
+=======
+export default CategoryForm;
+>>>>>>> e37e86e6ccda632c80d477b2d6de0d45860c5c1e
